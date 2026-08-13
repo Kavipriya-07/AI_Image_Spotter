@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+uploads/*
+!uploads/.gitkeep
+history.db
+dataset/
+artifacts/
+work/
+*.keras
+*.h5
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
