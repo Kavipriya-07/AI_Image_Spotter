@@ -7,7 +7,10 @@ uploads/*
 !uploads/.gitkeep
 history.db
 dataset/
-artifacts/
+artifacts/*
+!artifacts/real_fake_classifier.joblib
+!artifacts/metrics.json
+!artifacts/model_info.json
 work/
 *.keras
 *.h5

@@ -1,0 +1,16 @@
+{
+  "model": "StandardScaler + LogisticRegression",
+  "image_size": "32x32 RGB + grayscale",
+  "train_samples": 4800,
+  "test_samples": 1200,
+  "dataset_files": [
+    "test-00000-of-00001.parquet",
+    "train-00000-of-00003.parquet",
+    "train-00001-of-00003.parquet",
+    "train-00002-of-00003.parquet"
+  ],
+  "classes": [
+    0,
+    1
+  ]
+}

@@ -45,7 +45,8 @@ def predict():
         return jsonify({"status": "success", **result, **metadata, **record, "analysis_time": analysis_time})
     except ImageValidationError as error:
         return jsonify({"status": "error", "message": str(error)}), 400
-    except ModelUnavailableError:
+    except ModelUnavailableError as error:
+        current_app.logger.exception("Model unavailable: %s", error)
         return jsonify({"status": "error", "message": "The trained model is currently unavailable. Please try again later."}), 503
     except Exception:
         return jsonify({"status": "error", "message": "Analysis could not be completed. Please try another image."}), 500
