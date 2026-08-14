@@ -1,6 +1,6 @@
 """JSON APIs for prediction, history, statistics, and model information."""
 from datetime import datetime, timezone
-import os, sqlite3, time, uuid
+import json, os, sqlite3, time, uuid
 from pathlib import Path
 from flask import Blueprint, current_app, jsonify, request, send_from_directory
 from werkzeug.utils import secure_filename
@@ -73,7 +73,20 @@ def statistics():
 
 @prediction_bp.get("/model-info")
 def model_info():
-    return jsonify({"status": "success", "model": "Real vs AI-generated image classifier", "architecture": "StandardScaler + LogisticRegression", "framework": "scikit-learn", "classes": ["Real", "AI-Generated"], "input": "32 × 32 RGB + grayscale features", "status_label": "Trained model active", "model_used": MODEL_NAME})
+    from model.model_loader import MODEL_PATH
+    available = MODEL_PATH.is_file()
+    payload = {"status": "success", "model": "Real vs AI-generated image classifier", "architecture": "StandardScaler + LogisticRegression", "framework": "scikit-learn", "classes": ["Real", "AI-Generated"], "input": "32 × 32 RGB + grayscale features", "model_available": available, "status_label": "Trained model active" if available else "Trained model artifact missing", "model_used": MODEL_NAME}
+    try:
+        metrics = json.loads((MODEL_PATH.parent / "metrics.json").read_text(encoding="utf-8"))
+        payload["accuracy"] = round(metrics["accuracy"], 4)
+        payload["test_samples"] = metrics.get("test_samples")
+        matrix = metrics.get("confusion_matrix") or []
+        if len(matrix) == 2 and sum(matrix[0]) and sum(matrix[1]):
+            payload["recall_real"] = round(matrix[0][0] / sum(matrix[0]), 4)
+            payload["recall_ai"] = round(matrix[1][1] / sum(matrix[1]), 4)
+    except (OSError, ValueError, KeyError, TypeError):
+        current_app.logger.warning("Could not read metrics.json for /api/model-info")
+    return jsonify(payload)
 
 
 @prediction_bp.get("/uploads/<path:filename>")
